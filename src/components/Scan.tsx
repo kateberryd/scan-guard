@@ -84,7 +84,7 @@ export default function ScanProduct() {
 				<Modal title="" open={open} close={() => setOpen(false)}>
 					{product != null ? (
 						<div className="">
-							<div className="hidden lg:grid  grid-cols-5 py-5 items-center gap-10">
+							<div className="hidden lg:grid  grid-cols-6 py-5 items-center gap-10">
 								<div className="col-span-2">
 									<p className="text-[48px] text-textPrimary font-semibold font-lato leading-[57.9px]">
 										{product?.name}
@@ -99,8 +99,8 @@ export default function ScanProduct() {
 										{product?.manufacturer}
 									</p>
 								</div>
-								<div className="col-span-1">
-									<img src={product?.image} alt="product-image" />
+								<div className="col-span-2 w-full h-full">
+									<img src={product?.image} className="w-full h-full object-cover" alt="product-image" />
 									{/* <div className="flex items-center justify-between pt-5">
 										<div className="space-y-2 flex items-center justify-center flex-col">
 											<ScanIcon2 />
@@ -182,7 +182,7 @@ export default function ScanProduct() {
 
 									<div className="flex items-center justify-between pt-10">
 										<button className="shadow-lg bg-white px-10 py-2 flex items-center gap-2 rounded-full">
-											<SaveIcon /> <p>Save Scan</p>
+											<SaveIcon /> 
 										</button>
 
 										<button className="shadow-lg bg-white px-10 py-2 flex items-center gap-2 rounded-full">
