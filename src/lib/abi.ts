@@ -24,6 +24,20 @@ export const abi = [
     ]
   },
   {
+    "type": "struct",
+    "name": "scanguard::base::types::ProductParams",
+    "members": [
+      {
+        "name": "product_id",
+        "type": "core::felt252"
+      },
+      {
+        "name": "ipfs_hash",
+        "type": "core::byte_array::ByteArray"
+      }
+    ]
+  },
+  {
     "type": "interface",
     "name": "scanguard::interfaces::IProduct::IProducts",
     "items": [
@@ -38,7 +52,7 @@ export const abi = [
         ],
         "outputs": [
           {
-            "type": "core::byte_array::ByteArray"
+            "type": "scanguard::base::types::ProductParams"
           }
         ],
         "state_mutability": "view"

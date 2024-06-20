@@ -5,27 +5,28 @@ import {
 	StarIcon,
 	StarIcon2,
 } from "@/assets/icons";
-import { abi } from "@/lib/abi";
-import { CONTRACT_ADDR, formatIpfsHash, zkPassVerify } from "@/lib/config";
+import { CONTRACT_ADDR, formatDate, formatIpfsHash, zkPassVerify } from "@/lib/config";
 import { fetchIpfsFile } from "@/services/apiService";
-import {
-	useAccount,
-	useContractRead,
-	useContractWrite,
-	useWaitForTransaction,
-} from "@starknet-react/core";
+import { useAccount, useContractRead } from "@starknet-react/core";
 import React, { useEffect, useMemo, useState } from "react";
-import Modal from "../Modal";
 import { useParams } from "next/navigation";
+import Modal from "@/app/Modal";
+import { abi } from "@/lib/abi";
 type ProductProps = {
 	product_id: number;
 	name: string;
 	manufacturer: string;
+	image: string;
 	manufactureDate: string;
-  expiryDate: string;
+	expiryDate: string;
 };
+
 export default function ScanProduct() {
 	const [product, setProduct] = useState<ProductProps | any>();
+	const [contractData, setContractData] = useState<{
+		product_id: string;
+		ipfs_hash: string;
+	}>();
 	const [open, setOpen] = useState<boolean>(false);
 	const [openWallet, setOpenWallet] = useState<boolean>(false);
 
@@ -37,24 +38,22 @@ export default function ScanProduct() {
 		setOpenWallet((prev) => !prev);
 	};
 
-	const { data, isError, isLoading, error } = useContractRead({
+	const { data } = useContractRead({
 		functionName: "verify",
-		args: [payload as string],
+		args: [payload.toString()],
 		abi,
 		address: CONTRACT_ADDR,
 		watch: true,
 	});
 
-	console.log(data?.toString(), error, isLoading, "result");
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				if (data) {
-					zkPassVerify()
-					const ipfsResults = await fetchIpfsFile(
-						formatIpfsHash(data.toString())
-					);
+					let hash: string = (data as any).ipfs_hash;
+					// zkPassVerify();
+					const ipfsResults = await fetchIpfsFile(hash);
 					setProduct(ipfsResults);
 				}
 			} catch (e) {
@@ -76,6 +75,9 @@ export default function ScanProduct() {
 		}
 	}, [payload]);
 
+
+	console.log(product)
+
 	return (
 		<>
 			<div className="flex flex-col items-center justify-center">
@@ -85,25 +87,21 @@ export default function ScanProduct() {
 							<div className="hidden lg:grid  grid-cols-5 py-5 items-center gap-10">
 								<div className="col-span-2">
 									<p className="text-[48px] text-textPrimary font-semibold font-lato leading-[57.9px]">
-									{product?.name}
+										{product?.name}
 									</p>
 									<div className="flex  items-center gap-2 pt-10 ">
-										<p className="text-base   text-textPrimary font-normal font-lato">
-											Price:
-										</p>
 										
 									</div>
 									<p className="text-[20px] py-5 text-[#40403E] font-semibold font-lato leading-[24px]">
 										About the Company/Producer
 									</p>
 									<p className="text-[16px] text-[#40403E] font-normal font-lato leading-[24px]">
-										XYZ started the production of XY some years ago and has
-										multiple variations of the product.
+										{product?.manufacturer}
 									</p>
 								</div>
 								<div className="col-span-1">
-									<img src="/product.png" alt="product-image" />
-									<div className="flex items-center justify-between pt-5">
+									<img src={product?.image} alt="product-image" />
+									{/* <div className="flex items-center justify-between pt-5">
 										<div className="space-y-2 flex items-center justify-center flex-col">
 											<ScanIcon2 />
 											<p className="text-xs text-center font-lato leading-[9.6px]">
@@ -117,7 +115,7 @@ export default function ScanProduct() {
 												Save
 											</p>
 										</div>
-									</div>
+									</div> */}
 								</div>
 
 								<div className="col-span-2">
@@ -131,7 +129,7 @@ export default function ScanProduct() {
 												Manu. Date (DD.MM.YY):
 											</p>
 											<p className="text-[#40403E] text-[40px] font-bold font-lato leading-[52.2px]">
-												15. 05. 2024
+												{formatDate(product?.manufactureDate)}
 											</p>
 										</div>
 
@@ -140,7 +138,7 @@ export default function ScanProduct() {
 												No. Of Scans
 											</p>
 											<p className="text-[#40403E] text-[40px] font-bold font-lato leading-[52.2px]">
-												42
+											0
 											</p>
 										</div>
 									</div>
@@ -151,7 +149,7 @@ export default function ScanProduct() {
 												Exp Date (DD.MM.YY):
 											</p>
 											<p className="text-[#EE5D55] text-[40px] font-bold font-lato leading-[52.2px]">
-												15. 07. 2024
+												{formatDate(product?.expiryDate)}
 											</p>
 										</div>
 
@@ -161,7 +159,7 @@ export default function ScanProduct() {
 											</p>
 											<div className="flex  items-center gap-2">
 												<p className="text-[#40403E] text-[40px] font-bold font-lato leading-[52.2px]">
-													4.0
+													5.0
 												</p>
 												<StarIcon width={36} height={53} />
 											</div>
@@ -177,14 +175,14 @@ export default function ScanProduct() {
 											</div>
 
 											<div className="flex items-center justify-center bg-[#17212D1F] rounded-md px-5 py-2">
-												<p className="text-[#506480] font-lato">Ginger</p>
+												<p className="text-[#506480] font-lato">Grapes</p>
 											</div>
 										</div>
 									</div>
 
 									<div className="flex items-center justify-between pt-10">
 										<button className="shadow-lg bg-white px-10 py-2 flex items-center gap-2 rounded-full">
-											<LikeIcon /> <p>97%</p>
+											<SaveIcon /> <p>Save Scan</p>
 										</button>
 
 										<button className="shadow-lg bg-white px-10 py-2 flex items-center gap-2 rounded-full">
@@ -196,18 +194,18 @@ export default function ScanProduct() {
 
 							<div className="flex flex-col lg:hidden  py-5 items-center gap-10">
 								<p className="text-[38px] text-textPrimary font-semibold font-lato leading-[57.9px]">
-									Ginger Drink
+									{product?.name}
 								</p>
 
 								<div className="">
-									<img src="/product.png" alt="product-image" />
-									<div className="flex items-center justify-between pt-5">
-										<div className="space-y-2 flex items-center justify-center flex-col">
+								<img src={product?.image} alt="product-image" />
+								<div className="flex items-center justify-between pt-5">
+										{/* <div className="space-y-2 flex items-center justify-center flex-col">
 											<ScanIcon2 />
 											<p className="text-xs text-center font-lato leading-[9.6px]">
 												Scan Again
 											</p>
-										</div>
+										</div> */}
 
 										<div className="space-y-2 flex items-center justify-center flex-col">
 											<SaveIcon />
@@ -230,7 +228,8 @@ export default function ScanProduct() {
 													Manu. Date (DD.MM.YY):
 												</p>
 												<p className="text-[#40403E] text-[24px] lg:text-[40px] font-bold font-lato leading-[31.2px] lg:leading-[52.2px]">
-													15. 05. 2024
+												{formatDate(product?.manufactureDate)}
+
 												</p>
 											</div>
 
@@ -250,7 +249,7 @@ export default function ScanProduct() {
 													Exp Date (DD.MM.YY):
 												</p>
 												<p className="text-[#EE5D55]  text-[24px] lg:text-[40px] font-bold font-lato leading-[31.2px] lg:leading-[52.2px]">
-													15. 07. 2024
+												{formatDate(product?.expiryDate)}
 												</p>
 											</div>
 
@@ -295,29 +294,28 @@ export default function ScanProduct() {
 
 								<div className="">
 									<div className="flex  items-center gap-2 pt-10 ">
-										<p className="text-base   text-textPrimary font-normal font-lato">
+										{/* <p className="text-base   text-textPrimary font-normal font-lato">
 											Price:
-										</p>
-										<p>
+										</p> */}
+										{/* <p>
 											NGN{" "}
 											<span className="font-extrabold text-textPrimary text-[20px]  ">
 												690.
 											</span>
 											00
-										</p>
+										</p> */}
 									</div>
 									<p className="text-[20px] py-5 text-[#40403E] font-semibold font-lato leading-[24px]">
 										About the Company/Producer
 									</p>
 									<p className="text-[16px] text-[#40403E] font-normal font-lato leading-[24px]">
-										XYZ started the production of XY some years ago and has
-										multiple variations of the product.
+										{product?.manufacturer}
 									</p>
 								</div>
 							</div>
 						</div>
 					) : (
-						<div className="">
+						<div className=" flex items-center justify-center">
 							<p className="text-2xl">No Product Found...</p>
 						</div>
 					)}
