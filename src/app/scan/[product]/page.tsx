@@ -1,5 +1,8 @@
 "use client";
-import WalletBar from "@/components/WalletBar";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useAccount } from "@starknet-react/core";
 import {
 	DiscordIcon,
 	LearnmoreIcon,
@@ -7,28 +10,30 @@ import {
 	ScanIcon,
 	TelegramIcon,
 	TwitterIcon,
-} from "../assets/icons";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import Modal from "./Modal";
-import { useContractWrite, useWaitForTransaction } from "@starknet-react/core";
-import ConnectModal from "./components/ConnectModal";
-import { useAccount } from "@starknet-react/core";
-import AddressBar from "./components/Addressbar";
-import ScanProduct from "./components/Scan";
+} from "@/assets/icons";
+import AddressBar from "@/app/components/Addressbar";
+import ScanProduct from "@/app/components/Scan";
+import ConnectModal from "@/app/components/ConnectModal";
 import { useParams } from "next/navigation";
 
-export default function Home() {
+export default function ScanPage() {
 	const { address } = useAccount();
+	const [open, setOpen] = useState<boolean>(false);
 	const [openConnectedModal, setOpenConnectedModal] = useState(false);
-
 
 	const toggleUserModal = () => {
 		setOpenConnectedModal((prev) => !prev);
 	};
 
+  const params = useParams();
+  let product = params?.product;
 
-  
+
+  useEffect(() => {
+   if(product != null){
+    setOpen(true)
+   }
+  }, [product])
 
 	return (
 		<main className="">
@@ -59,7 +64,9 @@ export default function Home() {
 					</div>
 
 					<div className=" flex gap-5">
-						
+						<div className="" onClick={() => setOpen((prev) => !prev)}>
+							<ScanIcon />
+						</div>
 
 						{!address ? (
 							<button
@@ -314,6 +321,7 @@ export default function Home() {
 				</div>
 			</footer>
 
+			{open && <ScanProduct />}
 
 			<ConnectModal isOpen={openConnectedModal} onClose={toggleUserModal} />
 		</main>

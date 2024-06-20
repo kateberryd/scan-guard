@@ -13,9 +13,11 @@
     "@heroicons/react": "^2.1.4",
     "@starknet-react/chains": "^0.1.7",
     "@starknet-react/core": "^2.8.2",
+    "axios": "^1.7.2",
     "get-starknet-core": "^3.3.0",
     "next": "14.0.2",
     "react": "^18",
+    "react-blockies": "^1.4.1",
     "react-dom": "^18",
     "starknet": "^5.29.0"
   },
