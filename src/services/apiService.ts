@@ -14,6 +14,6 @@ export const fetchIpfsFile = async (file: string) => {
     }
   } catch (error) {
     console.error('Error fetching IPFS file:', error);
-    throw error; // Re-throw the error for further handling if necessary
+    throw error;
   }
 };
